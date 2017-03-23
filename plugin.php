@@ -41,31 +41,31 @@ function atomarch_google_auth() {
     // This assumes that client_secrets.json file resides in the same directory as plugin.php
     $client->setAuthConfig( dirname(__FILE__) .'/client_secrets.json');
 
-    $client->setRedirectUri('https://' . $_SERVER['HTTP_HOST'] . '/admin/');
+    $client->setRedirectUri( yourls_admin_url() );
 
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         // User is logged in
         $client->setAccessToken($_SESSION['access_token']);
 	
 	if ( atomarch_check_domain($client) ) {
-		return true;
+	    return true;
 	} else {
-		echo "UNAUTHORIZED";
-		die();
+	    yourls_e( "User from Unauthorized Domain" );
+	    die();
 	}
 	
     } else {
-	if (! isset($_GET['code'])) {
-		// Generate a URL to request access from Google's OAuth 2.0 server
-		$auth_url = $client->createAuthUrl();
-		// Redirect the user to $auth_url so they can enter their Google credentials
-		header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+        if (! isset($_GET['code'])) {
+	    // Generate a URL to request access from Google's OAuth 2.0 server
+	    $auth_url = $client->createAuthUrl();
+	    // Redirect the user to $auth_url so they can enter their Google credentials
+	    header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
 	} else {
-		// Exchange an authorization code for an access token
-		$client->fetchAccessTokenWithAuthCode($_GET['code']);
-		$_SESSION['access_token'] = $client->getAccessToken();
-		$redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . '/admin/';
-		header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+	    // Exchange an authorization code for an access token
+	    $client->fetchAccessTokenWithAuthCode($_GET['code']);
+	    $_SESSION['access_token'] = $client->getAccessToken();
+	    $redirect_uri = yourls_admin_url();
+	    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 	}
     }
 }
@@ -87,9 +87,9 @@ function atomarch_check_domain( $google_client ) {
 	$user_domain = substr(strrchr($user_info['email'], "@"), 1);
 
 	if ($user_domain === APPROVED_DOMAIN) {
-		return true;
+	    return true;
 	} else {
-		return false;
+	    return false;
 	}
     }
 }	
