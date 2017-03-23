@@ -62,7 +62,7 @@ function atomarch_google_auth() {
 		header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
 	} else {
 		// Exchange an authorization code for an access token
-		$client->authenticate($_GET['code']);
+		$client->fetchAccessTokenWithAuthCode($_GET['code']);
 		$_SESSION['access_token'] = $client->getAccessToken();
 		$redirect_uri = 'https://' . $_SERVER['HTTP_HOST'] . '/admin/';
 		header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
@@ -72,7 +72,7 @@ function atomarch_google_auth() {
 
 function atomarch_check_domain( $google_client ) {
 
-    // Define domain that has access to login. Use * to allow access from any google account
+    // Define domain that has permission to login. Use * to allow access from any google account
     define('APPROVED_DOMAIN', "mydomain.com");
 
     if ( APPROVED_DOMAIN === "*" ) {
