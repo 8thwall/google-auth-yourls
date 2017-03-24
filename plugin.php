@@ -75,7 +75,7 @@ function atomarch_google_auth() {
 function atomarch_check_domain( $google_client ) {
 
     // Define domain that has permission to login. Use * to allow access from any google account
-    define('APPROVED_DOMAIN', "mydomain.com");
+    define('APPROVED_DOMAIN', "*");
 
     if ( APPROVED_DOMAIN === "*" ) {
 	return true;
