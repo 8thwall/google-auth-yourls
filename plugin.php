@@ -35,6 +35,7 @@ function atomarch_google_auth() {
     $client = new Google_Client();
     $client->addScope('profile');
     $client->addScope('email');
+    $client->setAccessType('offline');
     
     // See https://developers.google.com/api-client-library/php/auth/web-app to create
     // an OAuth 2.0 client ID, and download the resulting JSON file
@@ -44,16 +45,10 @@ function atomarch_google_auth() {
     $client->setRedirectUri( yourls_admin_url() );
 
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-        // User is logged in
-        $client->setAccessToken($_SESSION['access_token']);
-	
-	if ( atomarch_check_domain($client) ) {
-	    return true;
-	} else {
-	    yourls_e( "User from Unauthorized Domain" );
-	    die();
-	}
-	
+        // User has already authenticated against google, nothing to do
+        return true;
+        //$client->setAccessToken($_SESSION['access_token']);
+
     } else {
         if (! isset($_GET['code'])) {
 	    // Generate a URL to request access from Google's OAuth 2.0 server
@@ -62,8 +57,15 @@ function atomarch_google_auth() {
 	    header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
 	} else {
 	    // Exchange an authorization code for an access token
-	    $client->fetchAccessTokenWithAuthCode($_GET['code']);
-	    $_SESSION['access_token'] = $client->getAccessToken();
+            $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            //Store Access Token in a session variable
+            $_SESSION['access_token'] = $client->getAccessToken();
+
+            if ( atomarch_check_domain($client) === false ) {
+                yourls_e( "User from Unauthorized Domain." );
+                die();
+            }
+
 	    $redirect_uri = yourls_admin_url();
 	    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 	}
