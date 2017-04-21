@@ -31,7 +31,6 @@ yourls_add_filter( 'shunt_is_valid_user' , 'atomarch_google_auth' );
 function atomarch_google_auth() {
 
     session_start();
-
     $client = new Google_Client();
     $client->addScope('profile');
     $client->addScope('email');
@@ -84,7 +83,6 @@ function atomarch_check_domain( $google_client ) {
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
         $google_oauthV2 = new Google_Service_Oauth2($google_client);
-
         $user_info = $google_oauthV2->userinfo->get();
 	$user_domain = substr(strrchr($user_info['email'], "@"), 1);
 

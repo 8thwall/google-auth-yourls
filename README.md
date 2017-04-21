@@ -15,4 +15,3 @@ For now, here is the very rough documentation:
     - Edit define('APPROVED_DOMAIN', "mydomain.com");
     - If you want anyone with a Google account to get in (you probably don't want that), set to *
         - i.e. define('APPROVED_DOMAIN', "*");
-
