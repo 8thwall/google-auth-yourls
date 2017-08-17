@@ -11,14 +11,14 @@ Author URI: http://www.8thwall.com, http://www.tomarchio.cc
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
-/* Assumes thst you have anready downloaded and installed the  
+/* Assumes that you have already downloaded and installed the
  * Google APIs Client Library for PHP and it's in the same directory.
  * See https://github.com/google/google-api-php-client for install instructions.
  * Include your composer dependencies:
  */
 require_once __DIR__.'/vendor/autoload.php';
 
-/* The function yourls_is_valid_user() in includes/functions-auth.php checks for a valid user via the login 
+/* The function yourls_is_valid_user() in includes/functions-auth.php checks for a valid user via the login
  * form or stored cookie. The 'shunt_is_valid_user' filter allows plugins such as this one, to short-circuit
  * the entire function.
  */
@@ -36,7 +36,7 @@ function atomarch_google_auth() {
     $client->addScope('profile');
     $client->addScope('email');
     $client->setAccessType('offline');
-    
+
     // See https://developers.google.com/api-client-library/php/auth/web-app to create
     // an OAuth 2.0 client ID, and download the resulting JSON file
     // This assumes that client_secrets.json file resides in the same directory as plugin.php
@@ -45,30 +45,34 @@ function atomarch_google_auth() {
     $client->setRedirectUri( yourls_admin_url() );
 
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-        // User has already authenticated against google, nothing to do
+        // User has already authenticated against google with an approved domain, nothing to do
         return true;
-        //$client->setAccessToken($_SESSION['access_token']);
 
     } else {
+
         if (! isset($_GET['code'])) {
-	    // Generate a URL to request access from Google's OAuth 2.0 server
-	    $auth_url = $client->createAuthUrl();
-	    // Redirect the user to $auth_url so they can enter their Google credentials
-	    header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
-	} else {
-	    // Exchange an authorization code for an access token
+
+	        // Generate a URL to request access from Google's OAuth 2.0 server
+	        $auth_url = $client->createAuthUrl();
+	        // Redirect the user to $auth_url so they can enter their Google credentials
+	        header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+
+	    } else {
+	        // Exchange an authorization code for an access token
             $client->fetchAccessTokenWithAuthCode($_GET['code']);
             //Store Access Token in a session variable
             $_SESSION['access_token'] = $client->getAccessToken();
 
             if ( atomarch_check_domain($client) === false ) {
+                $client->revokeToken();
+                unset($_SESSION['access_token']);
                 yourls_e( "User from Unauthorized Domain." );
                 die();
             }
 
-	    $redirect_uri = yourls_admin_url();
-	    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
-	}
+	        $redirect_uri = yourls_admin_url();
+	        header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+	    }
     }
 }
 
@@ -78,7 +82,7 @@ function atomarch_check_domain( $google_client ) {
     define('APPROVED_DOMAIN', "*");
 
     if ( APPROVED_DOMAIN === "*" ) {
-	return true;
+	    return true;
     }
 
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
@@ -86,14 +90,14 @@ function atomarch_check_domain( $google_client ) {
         $google_oauthV2 = new Google_Service_Oauth2($google_client);
 
         $user_info = $google_oauthV2->userinfo->get();
-	$user_domain = substr(strrchr($user_info['email'], "@"), 1);
+	    $user_domain = substr(strrchr($user_info['email'], "@"), 1);
 
-	if ($user_domain === APPROVED_DOMAIN) {
-	    return true;
-	} else {
-	    return false;
-	}
+	    if ($user_domain === APPROVED_DOMAIN) {
+	        return true;
+	    } else {
+	        return false;
+	    }
     }
-}	
+}
 
 ?>
