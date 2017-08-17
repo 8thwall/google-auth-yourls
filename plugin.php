@@ -77,10 +77,11 @@ function atomarch_google_auth() {
 
 function atomarch_check_domain( $google_client ) {
 
-    // Define domain that has permission to login. Use * to allow access from any google account
-    define('APPROVED_DOMAIN', "*");
+    // List of domains that have permission to login. Use "*"" to allow access from any google account
+    //$APPROVED_DOMAINS = array("domain1.com", "domain2.com");
+    $APPROVED_DOMAINS = array("*");
 
-    if ( APPROVED_DOMAIN === "*" ) {
+    if ( in_array("*", $APPROVED_DOMAINS) ) {
 	    return true;
     }
 
@@ -90,7 +91,7 @@ function atomarch_check_domain( $google_client ) {
         $user_info = $google_oauthV2->userinfo->get();
 	    $user_domain = substr(strrchr($user_info['email'], "@"), 1);
 
-	    if ($user_domain === APPROVED_DOMAIN) {
+        if ( in_array($user_domain, $APPROVED_DOMAINS) ) {
 	        return true;
 	    } else {
 	        return false;
