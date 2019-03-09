@@ -1,0 +1,4 @@
+<Files "client_secrets.json">  
+  Order Allow,Deny
+  Deny from all
+</Files>
