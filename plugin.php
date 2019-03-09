@@ -58,9 +58,9 @@ function atomarch_google_auth() {
 
 	    } else {
 	        // Exchange an authorization code for an access token
-            $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
             //Store Access Token in a session variable
-            $_SESSION['access_token'] = $client->getAccessToken();
+            $_SESSION['access_token'] = $token;
 
             if ( atomarch_check_domain($client) === false ) {
                 $client->revokeToken();
