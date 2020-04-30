@@ -100,7 +100,7 @@ function atomarch_check_domain($google_client) {
 
         if (in_array($user_domain, $APPROVED_DOMAINS)) {
             return true;
-	    } else {
+        } else {
             return false;
         }
     }
