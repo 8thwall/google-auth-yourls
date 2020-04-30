@@ -61,6 +61,11 @@ function atomarch_google_auth() {
         } else {
             // Exchange an authorization code for an access token
             $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+
+	    if (!array_key_exists('access_token', $token)) {
+	    	yourls_e("invalid token");
+		die();
+	    }
             //Store Access Token in a session variable
             $_SESSION['access_token'] = $token;
 
@@ -81,7 +86,7 @@ function atomarch_check_domain($google_client) {
 
     // List of domains that have permission to login. Use "*"" to allow access from any google account
     //$APPROVED_DOMAINS = array("domain1.com", "domain2.com");
-    $APPROVED_DOMAINS = array("*");
+    $APPROVED_DOMAINS = array("sirclo.co.id");
 
     if (in_array("*", $APPROVED_DOMAINS)) {
         return true;
@@ -95,7 +100,7 @@ function atomarch_check_domain($google_client) {
 
         if (in_array($user_domain, $APPROVED_DOMAINS)) {
             return true;
-        } else {
+	    } else {
             return false;
         }
     }
