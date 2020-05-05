@@ -61,6 +61,11 @@ function atomarch_google_auth() {
         } else {
             // Exchange an authorization code for an access token
             $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+
+	    if (!array_key_exists('access_token', $token)) {
+	    	yourls_e("invalid token");
+		die();
+	    }
             //Store Access Token in a session variable
             $_SESSION['access_token'] = $token;
 
