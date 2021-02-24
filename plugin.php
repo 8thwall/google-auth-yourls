@@ -52,7 +52,8 @@ function atomarch_google_auth() {
     } else {
 
         if (!isset($_GET['code'])) {
-
+            // Force google account selection
+            $client->setApprovalPrompt("force");
             // Generate a URL to request access from Google's OAuth 2.0 server
             $auth_url = $client->createAuthUrl();
             // Redirect the user to $auth_url so they can enter their Google credentials
