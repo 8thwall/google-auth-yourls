@@ -47,9 +47,7 @@ function atomarch_google_auth() {
 
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         // User has already authenticated against google with an approved domain, nothing to do
-        $google_oauthV2 = new Google_Service_Oauth2($google_client);
-        $user_info = $google_oauthV2->userinfo->get();
-        yourls_set_user($user_info['email']);
+        yourls_set_user($_SESSION['google_oauth_user']);
 	return true;
 
     } else {
@@ -91,18 +89,15 @@ function atomarch_check_domain($google_client) {
     //$APPROVED_DOMAINS = array("domain1.com", "domain2.com");
     $APPROVED_DOMAINS = array("*");
 
-    if (in_array("*", $APPROVED_DOMAINS)) {
-        return true;
-    }
-
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
         $google_oauthV2 = new Google_Service_Oauth2($google_client);
         $user_info = $google_oauthV2->userinfo->get();
         $user_domain = substr(strrchr($user_info['email'], "@"), 1);
 
-        if (in_array($user_domain, $APPROVED_DOMAINS)) {
-            yourls_set_user($user_info['email']);
+        if ((in_array($user_domain, $APPROVED_DOMAINS)) || (in_array("*", $APPROVED_DOMAINS))) {
+	    $_SESSION['google_oauth_user'] = $user_info['email'];
+            yourls_set_user($_SESSION['google_oauth_user']);
             return true;
         } else {
             return false;
