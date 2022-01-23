@@ -50,35 +50,44 @@ function atomarch_google_auth() {
         return true;
 
     } else {
+	
+	// If user sending request with API, check user credentials
+	if(yourls_is_API()){
+		
+	    yourls_check_username_password();
+		
+	}else{
+	   
+	    if (!isset($_GET['code'])) {
 
-        if (!isset($_GET['code'])) {
-
-            // Generate a URL to request access from Google's OAuth 2.0 server
-            $auth_url = $client->createAuthUrl();
-            // Redirect the user to $auth_url so they can enter their Google credentials
-            header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
-
-        } else {
-            // Exchange an authorization code for an access token
-            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-
-	    if (!array_key_exists('access_token', $token)) {
-	    	yourls_e("invalid token");
-		die();
-	    }
-            //Store Access Token in a session variable
-            $_SESSION['access_token'] = $token;
-
-            if (atomarch_check_domain($client) === false) {
-                $client->revokeToken();
-                unset($_SESSION['access_token']);
-                yourls_e("User from Unauthorized Domain.");
-                die();
+                // Generate a URL to request access from Google's OAuth 2.0 server
+                $auth_url = $client->createAuthUrl();
+                // Redirect the user to $auth_url so they can enter their Google credentials
+                header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+    
+            } else {
+                // Exchange an authorization code for an access token
+                $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    
+            if (!array_key_exists('access_token', $token)) {
+                yourls_e("invalid token");
+            die();
             }
-
-            $redirect_uri = yourls_admin_url();
-            header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
-        }
+                //Store Access Token in a session variable
+                $_SESSION['access_token'] = $token;
+    
+                if (atomarch_check_domain($client) === false) {
+                    $client->revokeToken();
+                    unset($_SESSION['access_token']);
+                    yourls_e("You can only access it with an ILA account.");
+                    die();
+                }
+    
+                $redirect_uri = yourls_admin_url();
+                header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+            }
+	}
+            
     }
 }
 
