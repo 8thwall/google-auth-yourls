@@ -86,7 +86,7 @@ function atomarch_check_domain($google_client) {
 
     // List of domains that have permission to login. Use "*"" to allow access from any google account
     //$APPROVED_DOMAINS = array("domain1.com", "domain2.com");
-    $APPROVED_DOMAINS = array("*");
+    $APPROVED_DOMAINS = array_map("trim", explode(",", getenv('APPROVED_DOMAINS')) ?: "*");
 
     if (in_array("*", $APPROVED_DOMAINS)) {
         return true;
