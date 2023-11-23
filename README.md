@@ -12,6 +12,6 @@ For now, here is the very rough documentation:
     - See https://developers.google.com/api-client-library/php/auth/web-app
     - place the client secrets file inside the google-auth/ plugin directory
 4. This plugin allows you to filter access based on domain (i.e. only @mydomain.com addresses)
-    - Edit define('APPROVED_DOMAIN', "mydomain.com");
-    - If you want anyone with a Google account to get in (you probably don't want that), set to *
-        - i.e. define('APPROVED_DOMAIN', "*");
+    - Set the domains as an env variable, e.g.
+    `export APPROVED_DOMAINS="one_domain.com,another_domain.com,a_third_domain.com"`
+    - Alternatively, you can hard-code the domains directly on line 89 of plugin.php
